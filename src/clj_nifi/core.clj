@@ -2,7 +2,8 @@
   (:import (org.apache.nifi.components PropertyDescriptor$Builder)
            (org.apache.nifi.processor Relationship$Builder ProcessSession)
            (org.apache.nifi.flowfile FlowFile)
-           (org.apache.nifi.processor.io OutputStreamCallback)))
+           (org.apache.nifi.processor.io OutputStreamCallback)
+           (java.io InputStream OutputStream)))
 
 (defn relationship [& {:keys [name description auto-terminate]
                        :or {name           "Relationship"
@@ -70,9 +71,47 @@
     (process [_ out]
       (spit out contents))))
 
+(defn write [{:keys [session file]} contents]
+  {:session session
+   :file    (.write session file
+                     (output-callback contents))})
+
+(defn append [{:keys [session file]} contents]
+  {:session session
+   :file    (.append session file
+                     (output-callback contents))})
+
+(defn with-read [{:keys [session file]} f & args]
+  (let [in (.read session file)
+        transformer (f in args)]
+    (transformer {:session session
+                  :file file})))
+
+(defn import-from
+  ([{:keys [session file]} ^InputStream in]
+    {:session session
+     :file (.importFrom session file in)})
+  ([{:keys [session file]} path keep-original?]
+     {:session session
+      :file (.importFrom session file path keep-original?)}))
+
+(defn export-to
+  ([{:keys [session file]} ^OutputStream out]
+   (.exportTo session file out)
+   {:session session
+    :file file})
+  ([{:keys [session file]} path append?]
+   (.exportTo session file path append?)
+   {:session session
+    :file file}))
+
+
 (defn demo [session]
   (-> (init nil session)
       create
       (put-attribute "a" "123")
       (put-attribute "b" "abc")
-      (remove-attribute "a")))
+      (remove-attribute "a")
+      (write "Goran car")
+      (append "123")
+      (with-read #(do (slurp %) identity))))
