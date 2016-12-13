@@ -46,64 +46,52 @@
 (defn init [context session]
   {:context context :session session})
 
-(defn create [{:keys [session]}]
-  {:session session
-   :file (.create session)})
+(defn create [{:keys [session] :as scope}]
+  (assoc scope :file (.create session)))
 
-(defn get-one [{:keys [session]}]
-  {:session session
-   :file (.get session)})
+(defn get-one [{:keys [session] :as scope}]
+  (assoc scope :file (.get session)))
 
-(defn penalize [{:keys [session file]}]
-  {:session session
-   :file (.penalize session file)})
+(defn penalize [{:keys [session file] :as scope}]
+  (assoc scope :file (.penalize session file)))
 
-(defn put-attribute [{:keys [session file]} k v]
-  {:session session
-   :file (.putAttribute session file k v)})
+(defn put-attribute [{:keys [session file] :as scope} k v]
+  (assoc scope :file (.putAttribute session file k v)))
 
-(defn remove-attribute [{:keys [session file]} k]
-  {:session session
-   :file (.removeAttribute session file k)})
+(defn remove-attribute [{:keys [session file] :as scope} k]
+  (assoc scope :file (.removeAttribute session file k)))
 
 (defn output-callback [contents]
   (reify OutputStreamCallback
     (process [_ out]
       (spit out contents))))
 
-(defn write [{:keys [session file]} contents]
-  {:session session
-   :file    (.write session file
-                     (output-callback contents))})
+(defn write [{:keys [session file] :as scope} contents]
+  (assoc scope :file (.write session file
+                       (output-callback contents))))
 
-(defn append [{:keys [session file]} contents]
-  {:session session
-   :file    (.append session file
-                     (output-callback contents))})
+(defn append [{:keys [session file] :as scope} contents]
+  (assoc scope :file (.append session file
+                       (output-callback contents))))
 
-(defn with-read [{:keys [session file]} f & args]
+(defn with-read [{:keys [session file] :as scope} f & args]
   (let [in (.read session file)
-        transformer (f in args)]
-    (transformer {:session session
-                  :file file})))
+        transformer (or (f in args) identity)]
+    (transformer scope)))
 
 (defn import-from
-  ([{:keys [session file]} ^InputStream in]
-    {:session session
-     :file (.importFrom session file in)})
-  ([{:keys [session file]} path keep-original?]
-     {:session session
-      :file (.importFrom session file path keep-original?)}))
+  ([{:keys [session file] :as scope} ^InputStream in]
+   (assoc scope :file (.importFrom session file in)))
+  ([{:keys [session file] :as scope} path keep-original?]
+   (assoc scope :file (.importFrom session file path keep-original?))))
 
 (defn export-to
-  ([{:keys [session file]} ^OutputStream out]
+  ([{:keys [session file] :as scope} ^OutputStream out]
    (.exportTo session file out)
-   {:session session
-    :file file})
-  ([{:keys [session file]} path append?]
+   scope)
+  ([{:keys [session file] :as scope} path append?]
    (.exportTo session file path append?)
-   {:session session
-    :file file}))
+   scope))
 
 
 (defn demo [session]
