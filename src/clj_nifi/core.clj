@@ -93,9 +93,13 @@
    (.exportTo session file path append?)
    scope))
 
-(defn transfer [{:keys [session file] :as scope} rel]
+(defn transfer
+  ([{:keys [session file] :as scope}]
+   (.transfer session file)
+   scope)
+  ([{:keys [session file] :as scope} rel]
   (.transfer session file rel)
-  scope)
+  scope))
 
 
 (defn demo [session]
