@@ -43,6 +43,9 @@
       (.allowableValues (if allowable-values (set allowable-values)))
       (.build)))
 
+(defn queue-size [session]
+  (.getQueueSize session))
+
 (defn init [context session]
   {:context context :session session})
 
@@ -73,9 +76,9 @@
 
 (defn clone
   ([{:keys [session] :as scope} parent]
-   (assoc scope :file (.clone session (:file parent))))
+   (assoc scope :file (.clone session parent)))
   ([{:keys [session] :as scope} parent offset size]
-   (assoc scope :file (.clone session (:file parent) offset size))))
+   (assoc scope :file (.clone session parent offset size))))
 
 (defn put-attribute [{:keys [session file] :as scope} k v]
   (assoc scope :file (.putAttribute session file k v)))
@@ -121,6 +124,12 @@
   ([{:keys [session file] :as scope} path append?]
    (.exportTo session file path append?)
    scope))
+
+(defn merge-files
+  ([{:keys [session file] :as scope} sources]
+   (assoc scope :file (.merge session file sources)))
+  ([{:keys [session file] :as scope} sources header footer demarcator]
+   (assoc scope :file (.merge session file sources header footer demarcator))))
 
 (defn transfer
   ([{:keys [session file] :as scope}]
