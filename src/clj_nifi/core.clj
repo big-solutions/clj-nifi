@@ -46,20 +46,49 @@
 (defn init [context session]
   {:context context :session session})
 
+(defn adjust-counter [{:keys [session] :as scope} counter delta immediate?]
+  (.adjustCounter session counter delta immediate?)
+  scope)
+
 (defn create [{:keys [session] :as scope}]
   (assoc scope :file (.create session)))
 
 (defn get-one [{:keys [session] :as scope}]
   (assoc scope :file (.get session)))
 
+(defn get-batch [{:keys [session] :as scope} ^int max-count]
+  (map #(assoc scope :file %)
+       (.get session max-count)))
+
+(defn get-by [{:keys [session] :as scope} file-filter]
+  (map #(assoc scope :file %)
+       (.get session file-filter)))
+
 (defn penalize [{:keys [session file] :as scope}]
   (assoc scope :file (.penalize session file)))
+
+(defn remove-file [{:keys [session file] :as scope}]
+  (.remove session file)
+  scope)
+
+(defn clone
+  ([{:keys [session] :as scope} parent]
+   (assoc scope :file (.clone session (:file parent))))
+  ([{:keys [session] :as scope} parent offset size]
+   (assoc scope :file (.clone session (:file parent) offset size))))
 
 (defn put-attribute [{:keys [session file] :as scope} k v]
   (assoc scope :file (.putAttribute session file k v)))
 
 (defn remove-attribute [{:keys [session file] :as scope} k]
   (assoc scope :file (.removeAttribute session file k)))
+
+(defn remove-attributes [{:keys [session file] :as scope} ks]
+  (assoc scope :file (.removeAllAttributes session file (set ks))))
+
+(defn remove-attributes-by [{:keys [session file] :as scope} pattern]
+  (assoc scope :file (.removeAllAttributes session file (re-pattern pattern))))
+
 
 (defn output-callback [contents]
   (reify OutputStreamCallback
@@ -101,13 +130,13 @@
   (.transfer session file rel)
   scope))
 
-
 (defn demo [session]
-  (-> (init nil session)
-      create
-      (put-attribute "a" "123")
-      (put-attribute "b" "abc")
-      (remove-attribute "a")
-      (write "Goran car")
-      (append "123")
-      (with-read #(do (slurp %) identity))))
+  (->> (-> (init nil session)
+           (get-batch 10))
+       (map #(-> % (write "hejhaj")
+                   (append "jaganjac")))))
+
+(defn demo2 [session]
+  (->> (get-batch (init nil session) 10)
+       (map #(write % "hejhaj"))
+       (map #(append % "jaganjac"))))
