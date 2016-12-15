@@ -1,9 +1,10 @@
 (ns clj-nifi.core
-  (:import (org.apache.nifi.components PropertyDescriptor$Builder)
-           (org.apache.nifi.processor Relationship$Builder ProcessSession)
+  (:import (org.apache.nifi.components PropertyDescriptor$Builder PropertyValue)
+           (org.apache.nifi.processor Relationship$Builder ProcessSession ProcessContext DataUnit)
            (org.apache.nifi.flowfile FlowFile)
            (org.apache.nifi.processor.io OutputStreamCallback)
-           (java.io InputStream OutputStream)))
+           (java.io InputStream OutputStream)
+           (java.util.concurrent TimeUnit)))
 
 (defn relationship [& {:keys [name description auto-terminate]
                        :or {name           "Relationship"
@@ -139,13 +140,67 @@
   (.transfer session file rel)
   scope))
 
-(defn demo [session]
-  (->> (-> (init nil session)
+(defn as-string [value]
+  (.getValue ^PropertyValue value))
+
+(defn as-double [value]
+  (.asDouble ^PropertyValue value))
+
+(defn as-float [value]
+  (.asFloat ^PropertyValue value))
+
+(defn as-integer [value]
+  (.asInteger ^PropertyValue value))
+
+(defn as-long [value]
+  (.asLong ^PropertyValue value))
+
+(defn as-data-size [value unit]
+  (.asDataSize ^PropertyValue value unit))
+
+(defn as-time-period [value unit]
+  (.asTimePeriod ^PropertyValue value unit))
+
+(defn as-controller [value]
+  (.asControllerService ^PropertyValue value))
+
+(def property-value-fns
+  {:string            as-string
+   :double            as-double
+   :float             as-float
+   :integer           as-integer
+   :long              as-long
+   :data.B            #(as-data-size % DataUnit/B)
+   :data.KB           #(as-data-size % DataUnit/KB)
+   :data.MB           #(as-data-size % DataUnit/MB)
+   :data.GB           #(as-data-size % DataUnit/GB)
+   :time.nanoseconds  #(as-time-period % TimeUnit/NANOSECONDS)
+   :time.microseconds #(as-time-period % TimeUnit/MICROSECONDS)
+   :time.milliseconds #(as-time-period % TimeUnit/MILLISECONDS)
+   :time.seconds      #(as-time-period % TimeUnit/SECONDS)
+   :time.minutes      #(as-time-period % TimeUnit/MINUTES)
+   :time.hours        #(as-time-period % TimeUnit/HOURS)
+   :time.day          #(as-time-period % TimeUnit/DAYS)
+   :controller        as-controller})
+
+(defn get-property
+  ([^ProcessContext context ^String prop]
+   (.getProperty context prop))
+  ([^ProcessContext context ^String prop value-fn-key]
+   ((value-fn-key property-value-fns) 
+     (.getProperty context prop))))
+
+(defn get-properties [^ProcessContext context]
+  (.getProperties context))
+
+
+(defn demo [context session]
+  (->> (-> (init context session)
            (get-batch 10))
        (map #(-> % (write "hejhaj")
                    (append "jaganjac")))))
 
-(defn demo2 [session]
-  (->> (get-batch (init nil session) 10)
+(defn demo2 [context session]
+  (->> (get-batch (init context session) 10)
        (map #(write % "hejhaj"))
        (map #(append % "jaganjac"))))
