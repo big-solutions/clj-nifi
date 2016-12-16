@@ -93,11 +93,12 @@
 (defn remove-attributes-by [{:keys [session file] :as scope} pattern]
   (assoc scope :file (.removeAllAttributes session file (re-pattern pattern))))
 
-
 (defn output-callback [contents]
   (reify OutputStreamCallback
     (process [_ out]
-      (spit out contents))))
+      (if (string? contents)
+          (.write out (.getBytes contents))
+          (.write out ^bytes contents)))))
 
 (defn write [{:keys [session file] :as scope} contents]
   (assoc scope :file (.write session file
