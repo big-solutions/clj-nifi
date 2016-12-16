@@ -194,6 +194,9 @@
 (defn get-properties [^ProcessContext context]
   (.getProperties context))
 
+(defn processor-name [^ProcessContext context]
+  (.getName context))
+
 
 (defn demo [context session]
   (->> (-> (init context session)
