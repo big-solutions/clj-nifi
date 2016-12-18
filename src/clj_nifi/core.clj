@@ -60,7 +60,7 @@
 (defn get-one [{:keys [session] :as scope}]
   (assoc scope :file (.get session)))
 
-(defn get-batch [{:keys [session] :as scope} ^int max-count]
+(defn get-batch [{:keys [session] :as scope} max-count]
   (map #(assoc scope :file %)
        (.get session max-count)))
 
@@ -165,6 +165,7 @@
 (defn as-controller [value]
   (.asControllerService ^PropertyValue value))
 
+
 (def property-value-fns
   {:string            as-string
    :double            as-double
@@ -198,6 +199,7 @@
   (.getName context))
 
 
+
 (defn demo [context session]
   (->> (-> (init context session)
            (get-batch 10))
@@ -208,3 +210,4 @@
   (->> (get-batch (init context session) 10)
        (map #(write % "hejhaj"))
        (map #(append % "jaganjac"))))
+
