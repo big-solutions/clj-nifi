@@ -1,12 +1,10 @@
 (def project 'big-solutions/clj-nifi)
 (def version "0.1.0-SNAPSHOT")
 
-(set-env! :resource-paths #{"resources" "src"}
-          :source-paths   #{"test"}
+(set-env! :resource-paths #{"resources"}
+          :source-paths   #{"src"}
           :dependencies   '[[org.clojure/clojure "1.8.0"]
                             [org.apache.nifi/nifi-api "1.1.0"]
-                            [org.apache.nifi/nifi-bootstrap "1.1.0"]
-                            [org.apache.nifi/nifi-runtime "1.1.0"]
                             [org.apache.nifi/nifi-processor-utils "1.1.0"]
 
                             [onetom/boot-lein-generate "0.1.3" :scope "test"]])
@@ -23,7 +21,7 @@
 (deftask build
   "Build and install the project locally."
   []
-  (comp (pom) (jar) (install)))
+  (comp (pom) (aot :all true) (jar) (install)))
 
 (deftask idea
          "Updates project.clj for Idea to pick up dependency changes."
