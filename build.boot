@@ -1,8 +1,7 @@
 (def project 'big-solutions/clj-nifi)
 (def version "0.1.0-SNAPSHOT")
 
-(set-env! :resource-paths #{"resources"}
-          :source-paths   #{"src"}
+(set-env! :resource-paths #{"resources" "src"}
           :dependencies   '[[org.clojure/clojure "1.8.0"]
                             [org.apache.nifi/nifi-api "1.1.0"]
                             [org.apache.nifi/nifi-processor-utils "1.1.0"]
