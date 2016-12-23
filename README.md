@@ -1,10 +1,17 @@
 # clj-nifi
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library/DSL for Apache NiFi processors.
 
 ## Usage
 
-FIXME
+To use this in your project:
+
+[![Clojars Project](https://img.shields.io/clojars/v/big-solutions/clj-nifi.svg)](https://clojars.org/big-solutions/clj-nifi)
+
+## See also
+
+- [boot-nifi](https:/github.com/big-solutions/boot-nifi) - a Clojure DSL for Apache NiFi
+- [clj-nifi-bundle] (https:/github.com/big-solutions/clj-nifi) - Boot template for clj-nifi projects
 
 ## License
 
