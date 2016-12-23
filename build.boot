@@ -1,12 +1,10 @@
 (def project 'big-solutions/clj-nifi)
-(def version "0.1.0-SNAPSHOT")
+(def version "0.1.0")
 
 (set-env! :resource-paths #{"resources" "src"}
           :dependencies   '[[org.clojure/clojure "1.8.0"]
                             [org.apache.nifi/nifi-api "1.1.0"]
-                            [org.apache.nifi/nifi-processor-utils "1.1.0"]
-
-                            [onetom/boot-lein-generate "0.1.3" :scope "test"]])
+                            [org.apache.nifi/nifi-processor-utils "1.1.0"]])
 
 (task-options!
  pom {:project     project
@@ -22,9 +20,3 @@
   []
   (comp (pom) (aot :all true) (jar) (install)))
 
-(deftask idea
-         "Updates project.clj for Idea to pick up dependency changes."
-         []
-         (require 'boot.lein)
-         (let [runner (resolve 'boot.lein/generate)]
-           (runner)))
