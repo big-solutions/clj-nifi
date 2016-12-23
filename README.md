@@ -10,8 +10,8 @@ To use this in your project:
 
 ## See also
 
-- [boot-nifi](https:/github.com/big-solutions/boot-nifi) - a Clojure DSL for Apache NiFi
-- [clj-nifi-bundle] (https:/github.com/big-solutions/clj-nifi) - Boot template for clj-nifi projects
+- [boot-nifi](https://github.com/big-solutions/boot-nifi) - a Clojure DSL for Apache NiFi
+- [clj-nifi-bundle] (https://github.com/big-solutions/clj-nifi) - Boot template for clj-nifi projects
 
 ## License
 
