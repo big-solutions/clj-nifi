@@ -198,16 +198,3 @@
 (defn processor-name [^ProcessContext context]
   (.getName context))
 
-
-
-(defn demo [context session]
-  (->> (-> (init context session)
-           (get-batch 10))
-       (map #(-> % (write "hejhaj")
-                   (append "jaganjac")))))
-
-(defn demo2 [context session]
-  (->> (get-batch (init context session) 10)
-       (map #(write % "hejhaj"))
-       (map #(append % "jaganjac"))))
-

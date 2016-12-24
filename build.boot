@@ -27,6 +27,6 @@
 (deftask build
   "Build and install the project locally."
   []
-  (comp (pom) (aot :all true) (jar) (install)))
+  (comp (pom) (apidoc) (aot :all true) (jar) (install)))
 
 
