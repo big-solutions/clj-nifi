@@ -8,6 +8,8 @@ To use this in your project:
 
 [![Clojars Project](https://img.shields.io/clojars/v/big-solutions/clj-nifi.svg)](https://clojars.org/big-solutions/clj-nifi)
 
+API docs: [apidocs](http://htmlpreview.github.io/?https://github.com/big-solutions/clj-nifi/blob/master/doc/api/index.html)
+
 ## See also
 
 - [boot-nifi](https://github.com/big-solutions/boot-nifi) - a Clojure DSL for Apache NiFi
